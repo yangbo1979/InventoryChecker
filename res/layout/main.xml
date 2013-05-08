@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:umadsdk="http://schemas.android.com/apk/res/com.LoveBus"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="42dp"
+        android:background="#FFFFFF" >
+
+        <TextView
+            android:id="@+id/txt_page_title_1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="@string/page_title_1"
+            android:textColor="#000000"
+            android:textSize="22.0dip" />
+
+        <TextView
+            android:id="@+id/txt_page_title_2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="@string/page_title_2"
+            android:textColor="#000000"
+            android:textSize="22.0dip" />
+
+        <TextView
+            android:id="@+id/txt_about"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="@string/about"
+            android:textColor="#000000"
+            android:textSize="22.0dip" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/cursor"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="matrix"
+        android:src="@drawable/a" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vPager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1.0"
+        android:background="#000000"
+        android:flipInterval="30"
+        android:persistentDrawingCache="animation" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:admobsdk="http://schemas.android.com/apk/res/com.admob.android.example"
+        android:id="@+id/adLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical" >
+                        
+        </LinearLayout>
+
+</LinearLayout>
