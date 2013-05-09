@@ -131,7 +131,7 @@ public class InventoryChecker<MyActivity> extends Activity {
 		String pref_barcode_col = settings.getString(BARCODE_COL, "");
 		if(pref_barcode_col != null)
 		{
-			System.out.println(pref_barcode_col);
+//			System.out.println(pref_barcode_col);
 			try
 			{
 				xls.setSearchColIndex(Integer.parseInt(pref_barcode_col));
@@ -287,14 +287,14 @@ public class InventoryChecker<MyActivity> extends Activity {
 
 	private void showInventoryDetail(int row)
 	{
-		System.out.println("showInventoryDetail ->Rows:"+xls.getRows()+ " /row:"+row);
+//		System.out.println("showInventoryDetail ->Rows:"+xls.getRows()+ " /row:"+row);
 		boolean bNewInventory = this.isNewInventory(row);
 		setContentView(R.layout.inventory_detail);
 		ListView mListView = (ListView) InventoryChecker.this.findViewById(R.id.lv_inventory_detail);
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map;
 		String inventoryValue = null;
-		if(bNewInventory)System.out.println("SHOW NEW ");
+//		if(bNewInventory)System.out.println("SHOW NEW ");
 		for(int i = 0; i < xls.getCols(); i++){
 			if(bNewInventory)
 			{
@@ -361,7 +361,6 @@ public class InventoryChecker<MyActivity> extends Activity {
 	private void setColDefaultValue(int col,String value)
 	{
 		rowDefaultValue.put(col, value);
-		System.out.println("setCol "+col+" DefaultValue:"+value);
 	}
 	
 	private String getColDefaultValue(int col)
@@ -460,10 +459,10 @@ public class InventoryChecker<MyActivity> extends Activity {
 			}
 			else
 			{
-				System.out.println("confirm row:"+xls.getRows()+" result:"+searchResult);
+//				System.out.println("confirm row:"+xls.getRows()+" result:"+searchResult);
 //				String resultStr = bNewInventory?InventoryChecker.this.getString(R.string.result_profit):InventoryChecker.this.getString(R.string.result_normal);
 				String resultStr = xls.getCell(searchResult, xls.getStatuesColId());
-				System.out.println("resultStr:"+resultStr);
+//				System.out.println("resultStr:"+resultStr);
 				if(!resultStr.equals(""))
 				{
 					//鐩樼偣鐘舵�鏍忎笉涓虹┖锛屽垯涓嶆敼鍙樿鍊�					
