@@ -34,6 +34,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,9 +49,10 @@ import android.widget.AdapterView.OnItemClickListener;
 /**
  * Tab妞ょ敻娼伴幍瀣◢濠婃垵濮╅崚鍥ㄥ床娴犮儱寮烽崝銊ф暰閺佸牊鐏� * 
  * @author D.Winter
+ * @param <MyActivity>
  * 
  */
-public class InventoryChecker extends Activity {
+public class InventoryChecker<MyActivity> extends Activity {
 	// ViewPager閺勭棟oogle SDk娑擃叀鍤滅敮锔炬畱娑擄拷閲滈梽鍕閸栧懐娈戞稉锟介嚋缁紮绱濋崣顖欎簰閻劍娼电�鐐靛箛鐏炲繐绠烽梻瀵告畱閸掑洦宕查妴锟�
 	// android-support-v4.jar
 	protected static final int MENU_ABOUT = Menu.FIRST;
@@ -73,6 +77,8 @@ public class InventoryChecker extends Activity {
 	private ArrayList<Integer> newInventory;
 	private AdView adView = null;
 	private String myAdMobId = "a150d2ba777e467";
+	
+	private HashMap <Integer,String> rowDefaultValue = new HashMap();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,19 +101,6 @@ public class InventoryChecker extends Activity {
 		{
 			iniFrontView();
 		}
-		//		else
-		//		{
-		//			startScan();
-		//		}
-//		else
-//		{
-//		System.out.println("xls.getSearchColIndex()"+xls.getSearchColIndex());
-//			iniFrontView();
-
-//			System.out.println("xls.getStatuesColId():"+xls.getStatuesColId());
-//			ArrayList cat1 = xls.getCatory(xls.getStatuesColId(), "");
-//			System.out.println("cat1.size()2:"+cat1.size());
-//		}
 	}
 	
 
@@ -309,11 +302,16 @@ public class InventoryChecker extends Activity {
 			}
 			inventoryValue = xls.getCell(searchResult, i);
 			if(i == xls.getSearchColIndex())inventoryValue = scanResult;
+			else if(inventoryValue.equals(""))
+			{
+				inventoryValue = getColDefaultValue(i);
+			}
 			map = new HashMap<String, Object>();
 			map.put("title", xls.getCell(0, i));
 			map.put("info", inventoryValue);
 			map.put("img", R.drawable.list_file);
 			list.add(map);
+			inventoryValue = "";
 			//			System.out.println(arrInventory[0][i]);
 			//			System.out.println(arrInventory[row][i]);
 		}
@@ -359,18 +357,41 @@ public class InventoryChecker extends Activity {
 
 	}
 
+	
+	private void setColDefaultValue(int col,String value)
+	{
+		rowDefaultValue.put(col, value);
+		System.out.println("setCol "+col+" DefaultValue:"+value);
+	}
+	
+	private String getColDefaultValue(int col)
+	{
+		String ret = "";
+		if(rowDefaultValue.get(col) != null)ret = rowDefaultValue.get(col);
+		return ret;
+	}
 
 
 	private void showCellSelection(int row, int col) 
 	{
 		// TODO Auto-generated method stub
-		//		System.out.println("ShowCellSelection/row:"+row+"/col:"+col+"/searchResult:"+searchResult);
+//				System.out.println("ShowCellSelection/row:"+row+"/col:"+col+"/searchResult:"+searchResult);
 		setContentView(R.layout.cell_selection);
 		ListView mListView = (ListView) InventoryChecker.this.findViewById(R.id.lv_cell_selection);
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		EditText txtValueTip = (EditText) InventoryChecker.this.findViewById(R.id.cell_selection_editText);
+		CheckBox chkSetDefault = (CheckBox)InventoryChecker.this.findViewById(R.id.chkSetDefault);
 		String cellValue = xls.getCell(row, col);
-		if(!cellValue.equals(""))txtValueTip.setText(cellValue);
+		if(!cellValue.equals(""))
+		{
+			txtValueTip.setText(cellValue);
+			if(getColDefaultValue(col).equals(cellValue))chkSetDefault.setChecked(true);
+		}
+		else if(!getColDefaultValue(col).equals(""))
+		{
+			txtValueTip.setText(getColDefaultValue(col));
+		}
+		
 		Map<String, Object> map;
 
 		for(int i = 0; i < xls.getUniqCol(col).size(); i++){
@@ -378,6 +399,17 @@ public class InventoryChecker extends Activity {
 			map.put("info",xls.getUniqCol(col).get(i));
 			list.add(map);
 		}
+		
+//		chkSetDefault.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//            
+//            @Override
+//            public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+//                // TODO Auto-generated method stub
+//            	
+//                Toast.makeText(InventoryChecker.this, arg1?InventoryChecker.this.getString(R.string.doneDefaultSet):InventoryChecker.this.getString(R.string.cancelDefaultSet), Toast.LENGTH_LONG).show();
+//            }
+//
+//        });
 
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -398,8 +430,15 @@ public class InventoryChecker extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				int intEditRow = searchResult == 0? xls.getRows():searchResult; 
+				int intEditRow = searchResult == 0? xls.getRows():searchResult;
 				EditText txtCellSelection = (EditText) InventoryChecker.this.findViewById(R.id.cell_selection_editText);
+				
+				CheckBox chkSetDefault = (CheckBox)InventoryChecker.this.findViewById(R.id.chkSetDefault);
+				if(chkSetDefault.isChecked())
+				{
+					setColDefaultValue(editColIndex,txtCellSelection.getText().toString());
+				}
+				
 				//鑷姩鏇存柊鏉＄爜鍖�				
 				xls.updateCell(intEditRow, xls.getSearchColIndex(), scanResult);
 				//鏇存柊鐐瑰嚮鍖哄煙

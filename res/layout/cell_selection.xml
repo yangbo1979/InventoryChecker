@@ -4,15 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/cell_selection_editText"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/cell_selection_new_option" >
+        android:layout_height="wrap_content" >
 
-        <requestFocus />
-    </EditText>
+        <EditText
+            android:id="@+id/cell_selection_editText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.67"
+            android:ems="10"
+            android:hint="@string/cell_selection_new_option" />
+
+        <CheckBox
+            android:id="@+id/chkSetDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setDefault" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lv_cell_selection"

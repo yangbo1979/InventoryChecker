@@ -35,5 +35,8 @@
     <string name="quit_programe">退出盘点吗？</string>
     <string name="no">否</string>
     <string name="open_file">打开文件</string>
+    <string name="setDefault">默认</string>
+    <string name="doneDefaultSet">设置默认值</string>
+    <string name="cancelDefaultSet">取消默认值</string>
 
 </resources>
