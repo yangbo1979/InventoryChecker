@@ -3,6 +3,7 @@ package com.shouwangchong;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.google.ads.*;
@@ -11,14 +12,22 @@ import com.shouwangchong.OpenFileDialog;
 import com.shouwangchong.R;
 import com.zxing.activity.CaptureActivity;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
@@ -52,6 +61,7 @@ import android.widget.AdapterView.OnItemClickListener;
  * @param <MyActivity>
  * 
  */
+@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 public class InventoryChecker<MyActivity> extends Activity {
 	// ViewPager閺勭棟oogle SDk娑擃叀鍤滅敮锔炬畱娑擄拷閲滈梽鍕閸栧懐娈戞稉锟介嚋缁紮绱濋崣顖欎簰閻劍娼电�鐐靛箛鐏炲繐绠烽梻瀵告畱閸掑洦宕查妴锟�
 	// android-support-v4.jar
@@ -68,6 +78,7 @@ public class InventoryChecker<MyActivity> extends Activity {
 	public static final String FILE_PATH = "INVENTORY_FILE_PATH";
 	public static final String PREF = "INVENTORY_PREF";
 	public static final String BARCODE_COL = "INVENTORY_BARCODE_COL";
+	public static final String SCAN_DEVICE_TYPE = "INVENTORY_SCAN_DEVICE_TYPE";
 	static private int openfileDialogId =0;
 
 	private ExcelManager xls = null;
@@ -79,7 +90,15 @@ public class InventoryChecker<MyActivity> extends Activity {
 	private String myAdMobId = "a150d2ba777e467";
 	
 	private HashMap <Integer,String> rowDefaultValue = new HashMap();
+	
+	private String scanDeviceType = "cam";//0 camera ,1 nfc
+	
+	//nfc 
+	private NfcAdapter mAdapter;
+    private PendingIntent mPendingIntent;
+    private NdefMessage mNdefPushMessage;
 
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -101,10 +120,74 @@ public class InventoryChecker<MyActivity> extends Activity {
 		{
 			iniFrontView();
 		}
+		
+		mAdapter = NfcAdapter.getDefaultAdapter(this); // 实例化NFC设备  
+		if (mAdapter == null) {  
+			  
+			Toast.makeText(this, "NFC is not available on this device.", Toast.LENGTH_SHORT).show();
+            return;  
+  
+        } else if (mAdapter != null){  
+            if(!mAdapter.isEnabled()) {  
+            	Toast.makeText(this, "扫描NFC标签，请在系统设置中先启用NFC功能！", Toast.LENGTH_SHORT).show();
+                return;  
+            }else{  
+                  
+                Toast.makeText(this, "NFC设备就绪.", Toast.LENGTH_SHORT).show();  
+                System.out.println("id:"+getNFCID(getIntent()));
+                String nfcResult = getNFCID(getIntent());
+                if(nfcResult.length()>0)handleResult(nfcResult);
+  
+            }  
+        } 
 	}
 	
+	//通过intent取NFC标签的id
+	@SuppressLint("NewApi")
+	private String getNFCID(Intent intent)
+	{
+		String ret = "";
+		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        NdefMessage[] msgs = null;
+        if (rawMsgs != null) {
+        	Parcelable tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        	Tag p = (Tag) tag;
+        	byte[] id = p.getId();
+        	System.out.println("id:"+getDec(id));
+            msgs = new NdefMessage[rawMsgs.length];
+            ret = Long.toString(getDec(id));
+            if(ret.length()>0)savePrefs(SCAN_DEVICE_TYPE,"nfc");
+            }
+		return ret;
+	}
 
 	
+	private String getHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = bytes.length - 1; i >= 0; --i) {
+            int b = bytes[i] & 0xff;
+            if (b < 0x10)
+                sb.append('0');
+            sb.append(Integer.toHexString(b));
+            if (i > 0) {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+	private long getDec(byte[] bytes) {
+        long result = 0;
+        long factor = 1;
+        for (int i = 0; i < bytes.length; ++i) {
+            long value = bytes[i] & 0xffl;
+            result += value * factor;
+            factor *= 256l;
+        }
+        return result;
+    }
+
+
 	private void iniFrontView()
 	{
 		setContentView(R.layout.main);
@@ -123,6 +206,18 @@ public class InventoryChecker<MyActivity> extends Activity {
 	private void restorePrefs()
 	{
 		SharedPreferences settings = getSharedPreferences(PREF, 0);
+		try
+		{
+			String scan_device_type = settings.getString(this.SCAN_DEVICE_TYPE, "cam");
+			if(!scan_device_type.equals(""))scanDeviceType = scan_device_type;
+			System.out.println("scanDeviceType"+scanDeviceType);
+			
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+//		
 		String pref_file_path = settings.getString(FILE_PATH, "");
 		if(! "".equals(pref_file_path))
 		{
@@ -166,6 +261,7 @@ public class InventoryChecker<MyActivity> extends Activity {
 	{
 		clearPrefs(FILE_PATH);
 		clearPrefs(BARCODE_COL);
+		clearPrefs(SCAN_DEVICE_TYPE);
 		inventoryFilePath = "";
 		if(xls !=null)
 		{
@@ -174,7 +270,24 @@ public class InventoryChecker<MyActivity> extends Activity {
 		}
 	}
 
+	private void handleResult(String result)
+	{
 
+		scanResult = result;
+		searchResult = searchBarcode(scanResult);
+		if(searchResult ==0)
+		{
+			//鎻愮ず鏂板
+
+			newInventory.add(xls.getRows());
+			showInventoryDetail(xls.getRows());
+			Toast.makeText(InventoryChecker.this,InventoryChecker.this.getString(R.string.unknow_barcode),Toast.LENGTH_LONG).show();
+		}
+		else
+		{
+			showInventoryDetail(searchResult);
+		}
+	}
 
 	private void startScan()
 	{
@@ -234,6 +347,8 @@ public class InventoryChecker<MyActivity> extends Activity {
 		{
 			Bundle bundle = data.getExtras();
 			scanResult = bundle.getString("result");
+			handleResult(scanResult);
+			/*
 			searchResult = searchBarcode(scanResult);
 			if(searchResult ==0)
 			{
@@ -247,6 +362,7 @@ public class InventoryChecker<MyActivity> extends Activity {
 			{
 				showInventoryDetail(searchResult);
 			}
+			*/
 		}
 		catch(Exception e)
 		{
@@ -716,6 +832,16 @@ public class InventoryChecker<MyActivity> extends Activity {
 			e.printStackTrace();
 		}
 	}
+	
+
+    @Override
+    public void onNewIntent(Intent intent) {
+//        setIntent(intent);
+        System.out.println("new intent action:"+intent.getAction());
+
+        String nfcResult = getNFCID(intent);
+        if(nfcResult.length()>0)handleResult(nfcResult);
+    }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
