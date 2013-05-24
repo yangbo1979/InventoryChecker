@@ -177,10 +177,11 @@ public class InventoryChecker<MyActivity> extends Activity {
     }
 
 	private long getDec(byte[] bytes) {
-        long result = 0;
+        long result = 0;  
         long factor = 1;
+        int[] reMap = {3,2,1,0};//调整16进制高低位
         for (int i = 0; i < bytes.length; ++i) {
-            long value = bytes[i] & 0xffl;
+            long value = bytes[reMap[i]] & 0xffl;
             result += value * factor;
             factor *= 256l;
         }
