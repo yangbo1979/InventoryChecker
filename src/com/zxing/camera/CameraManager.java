@@ -18,6 +18,7 @@ package com.zxing.camera;
 
 import java.io.IOException;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -60,6 +61,7 @@ public final class CameraManager {
   private final Context context;
   private final CameraConfigurationManager configManager;
   private Camera camera;
+  private boolean bLightOn = false;
   private Rect framingRect;
   private Rect framingRectInPreview;
   private boolean initialized;
@@ -131,14 +133,32 @@ public final class CameraManager {
 
       //FIXME
  //     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-      //是否使用前灯
+      //鏄惁浣跨敤鍓嶇伅
 //      if (prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false)) {
 //        FlashlightManager.enableFlashlight();
 //      }
       FlashlightManager.enableFlashlight();
     }
   }
-
+  
+  @SuppressLint("NewApi")
+  public void openLight()
+  {
+	  if (camera != null) 
+	  {
+		  Camera.Parameters parameter = camera.getParameters();
+		  if(!bLightOn)
+		  {
+			  parameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
+		  }
+		  else
+		  {
+			  parameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+		  }
+		  bLightOn = !bLightOn;
+		  camera.setParameters(parameter);
+	  }
+  }
   /**
    * Closes the camera driver if still in use.
    */

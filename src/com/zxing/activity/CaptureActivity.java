@@ -3,10 +3,12 @@ package com.zxing.activity;
 import java.io.IOException;
 import java.util.Vector;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -46,6 +48,7 @@ public class CaptureActivity extends Activity implements Callback {
 	private static final float BEEP_VOLUME = 0.10f;
 	private boolean vibrate;
 	private Button cancelScanButton;
+	private Button flashLightButton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -56,6 +59,7 @@ public class CaptureActivity extends Activity implements Callback {
 		CameraManager.init(getApplication());
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		cancelScanButton = (Button) this.findViewById(R.id.btn_cancel_scan);
+		flashLightButton = (Button) this.findViewById(R.id.btn_flashLight);
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
 	}
@@ -88,6 +92,22 @@ public class CaptureActivity extends Activity implements Callback {
 			@Override
 			public void onClick(View v) {
 				CaptureActivity.this.finish();
+			}
+		});
+		
+		flashLightButton.setOnClickListener(new OnClickListener() {
+			
+			@SuppressLint("NewApi")
+			@Override
+			public void onClick(View v) {
+				try
+				{
+					CameraManager.get().openLight();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		});
 	}

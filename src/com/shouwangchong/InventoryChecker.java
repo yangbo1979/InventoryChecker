@@ -404,6 +404,8 @@ public class InventoryChecker<MyActivity> extends Activity {
 
 	private void showInventoryDetail(int row)
 	{
+		Toast.makeText(this, "点击每一行可以自行修改内容", Toast.LENGTH_SHORT).show();
+    
 //		System.out.println("showInventoryDetail ->Rows:"+xls.getRows()+ " /row:"+row);
 		boolean bNewInventory = this.isNewInventory(row);
 		setContentView(R.layout.inventory_detail);
