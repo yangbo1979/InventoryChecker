@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 import jxl.CellType;
@@ -224,7 +226,6 @@ public class ExcelManager
 	{
 		try
 		{
-			//			log("getCellValue"+row+"-"+col);
 			return ws.getCell(col,row).getContents();
 		}
 		catch(Exception e)

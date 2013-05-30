@@ -402,13 +402,20 @@ public class InventoryChecker<MyActivity> extends Activity {
 	}
 
 
+	@SuppressLint("ShowToast")
 	private void showInventoryDetail(int row)
 	{
-		Toast.makeText(this, "点击每一行可以自行修改内容", Toast.LENGTH_SHORT).show();
-    
-//		System.out.println("showInventoryDetail ->Rows:"+xls.getRows()+ " /row:"+row);
+		
 		boolean bNewInventory = this.isNewInventory(row);
 		setContentView(R.layout.inventory_detail);
+		if(xls.getCell(row, xls.getStatuesColId()).equals(InventoryChecker.this.getString(R.string.result_normal)))
+		{
+			Toast.makeText(InventoryChecker.this,InventoryChecker.this.getString(R.string.duplicate_check),Toast.LENGTH_SHORT).show();
+		}
+		else
+		{
+			Toast.makeText(this, "点击每一行可以自行修改内容", Toast.LENGTH_SHORT).show();
+		}
 		ListView mListView = (ListView) InventoryChecker.this.findViewById(R.id.lv_inventory_detail);
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map;
@@ -431,8 +438,6 @@ public class InventoryChecker<MyActivity> extends Activity {
 			map.put("img", R.drawable.list_file);
 			list.add(map);
 			inventoryValue = "";
-			//			System.out.println(arrInventory[0][i]);
-			//			System.out.println(arrInventory[row][i]);
 		}
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -896,33 +901,40 @@ public class InventoryChecker<MyActivity> extends Activity {
 		int two = one * 2;// 妞ら潧宕� -> 妞ら潧宕� 閸嬪繒些闁诧拷
 		@Override
 		public void onPageSelected(int arg0) {
-			Animation animation = null;
-			switch (arg0) {
-			case 0:
-				if (currIndex == 1) {
-					animation = new TranslateAnimation(one, 0, 0, 0);
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, 0, 0, 0);
+			try
+			{
+				Animation animation = null;
+				switch (arg0) {
+				case 0:
+					if (currIndex == 1) {
+						animation = new TranslateAnimation(one, 0, 0, 0);
+					} else if (currIndex == 2) {
+						animation = new TranslateAnimation(two, 0, 0, 0);
+					}
+					break;
+				case 1:
+					if (currIndex == 0) {
+						animation = new TranslateAnimation(offset, one, 0, 0);
+					} else if (currIndex == 2) {
+						animation = new TranslateAnimation(two, one, 0, 0);
+					}
+					break;
+				case 2:
+					if (currIndex == 0) {
+						animation = new TranslateAnimation(offset, two, 0, 0);
+					} else if (currIndex == 1) {
+						animation = new TranslateAnimation(one, two, 0, 0);
+					}
+					break;
 				}
-				break;
-			case 1:
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(offset, one, 0, 0);
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, one, 0, 0);
-				}
-				break;
-			case 2:
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(offset, two, 0, 0);
-				} else if (currIndex == 1) {
-					animation = new TranslateAnimation(one, two, 0, 0);
-				}
-				break;
+				currIndex = arg0;
+				animation.setFillAfter(true);// True:閸ュ墽澧栭崑婊冩躬閸斻劎鏁剧紒鎾存将娴ｅ秶鐤�			animation.setDuration(300);
+				cursor.startAnimation(animation);
 			}
-			currIndex = arg0;
-			animation.setFillAfter(true);// True:閸ュ墽澧栭崑婊冩躬閸斻劎鏁剧紒鎾存将娴ｅ秶鐤�			animation.setDuration(300);
-			cursor.startAnimation(animation);
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 
 		@Override
