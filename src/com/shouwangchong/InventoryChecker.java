@@ -98,6 +98,8 @@ public class InventoryChecker<MyActivity> extends Activity {
     private PendingIntent mPendingIntent;
     private NdefMessage mNdefPushMessage;
 
+    
+    
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -838,6 +840,36 @@ public class InventoryChecker<MyActivity> extends Activity {
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	public void onPause()
+	{
+		super.onPause();
+        System.out.println("inventory checker PAUSED.");
+		try
+		{
+			if(xls.isFileOpened())xls.closeFile();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void onResume()
+	{
+		super.onResume();
+        System.out.println("inventory checker RESUMED.");
+        if(xls==null)xls = new ExcelManager();
+		newInventory = new ArrayList();
+		xls.setInventoryResultTitle(InventoryChecker.this.getString(R.string.inventory_result_title));
+		restorePrefs();
+		if(!xls.openFile(inventoryFilePath))
+		{
+			clearAllPrefs();
+			showDialog(openfileDialogId);
 		}
 	}
 	
