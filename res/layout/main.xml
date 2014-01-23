@@ -64,7 +64,7 @@
         xmlns:admobsdk="http://schemas.android.com/apk/res/com.admob.android.example"
         android:id="@+id/adLayout"
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
         android:orientation="vertical" >
                         
         </LinearLayout>

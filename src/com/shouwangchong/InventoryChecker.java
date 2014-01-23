@@ -86,8 +86,8 @@ public class InventoryChecker<MyActivity> extends Activity {
 	private String scanResult;
 	private int editColIndex;
 	private ArrayList<Integer> newInventory;
-	private AdView adView = null;
-	private String myAdMobId = "a150d2ba777e467";
+//	private AdView adView = null;
+//	private String myAdMobId = "a150d2ba777e467";
 	
 	private HashMap <Integer,String> rowDefaultValue = new HashMap();
 	
@@ -197,12 +197,12 @@ public class InventoryChecker<MyActivity> extends Activity {
 		InitImageView();
 		InitTextView();
 		InitViewPager();
-		adView = new AdView(this,AdSize.BANNER,myAdMobId);
-		LinearLayout layout = (LinearLayout)findViewById(R.id.adLayout);
-		layout.addView(adView);
+//		adView = new AdView(this,AdSize.BANNER,myAdMobId);
+//		LinearLayout layout = (LinearLayout)findViewById(R.id.adLayout);
+//		layout.addView(adView);
 
         // 初始化请求对象
-        adView.loadAd(new AdRequest());
+//        adView.loadAd(new AdRequest());
 		
 	}
 
@@ -831,7 +831,7 @@ public class InventoryChecker<MyActivity> extends Activity {
 
 	public void onDestroy()
 	{
-		adView.destroy();//还有这里退出销毁广告视图
+//		adView.destroy();//还有这里退出销毁广告视图
 		super.onDestroy();
 		try
 		{
